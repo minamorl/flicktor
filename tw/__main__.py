@@ -22,6 +22,11 @@ def _api():
 def subcommand_say(args):
     _api().statuses_update(status=args.status)
 
+def subcommand_log(args):
+    logs = _api().statuses_user_timeline(screen_name=args.screen_name)
+    for l in logs:
+        print(l['text'])
+
 def import_configurations(path):
     config = configparser.ConfigParser()
     config.read(os.path.expanduser(path))
@@ -30,9 +35,14 @@ def import_configurations(path):
 def _argpaser():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers()
+
     subparser_say = subparsers.add_parser('say')
     subparser_say.add_argument('status', )
     subparser_say.set_defaults(func=subcommand_say)
+
+    subparser_log = subparsers.add_parser('log')
+    subparser_log.add_argument('screen_name')
+    subparser_log.set_defaults(func=subcommand_log)
 
     return parser
 
