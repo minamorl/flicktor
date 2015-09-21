@@ -19,8 +19,10 @@ def _api():
     api.auth(conf["CONSUMER_KEY"], conf["CONSUMER_SECRET"], conf["ACCESS_TOKEN_KEY"], conf["ACCESS_TOKEN_SECRET"])
     return api
 
+
 def subcommand_say(args):
     _api().statuses_update(status=args.status)
+
 
 def subcommand_log(args):
     screen_name = args.screen_name or _api().account_verify_credentials()['screen_name']
@@ -28,10 +30,12 @@ def subcommand_log(args):
     for l in logs:
         print(l['text'])
 
+
 def import_configurations(path):
     config = configparser.ConfigParser()
     config.read(os.path.expanduser(path))
     return config
+
 
 def _argpaser():
     parser = argparse.ArgumentParser()
