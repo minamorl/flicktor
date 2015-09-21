@@ -23,7 +23,8 @@ def subcommand_say(args):
     _api().statuses_update(status=args.status)
 
 def subcommand_log(args):
-    logs = _api().statuses_user_timeline(screen_name=args.screen_name)
+    screen_name = args.screen_name or _api().account_verify_credentials()['screen_name']
+    logs = _api().statuses_user_timeline(screen_name=screen_name)
     for l in logs:
         print(l['text'])
 
@@ -37,11 +38,11 @@ def _argpaser():
     subparsers = parser.add_subparsers()
 
     subparser_say = subparsers.add_parser('say')
-    subparser_say.add_argument('status', )
+    subparser_say.add_argument('status')
     subparser_say.set_defaults(func=subcommand_say)
 
     subparser_log = subparsers.add_parser('log')
-    subparser_log.add_argument('screen_name')
+    subparser_log.add_argument('screen_name', nargs='*', default=None)
     subparser_log.set_defaults(func=subcommand_log)
 
     return parser
