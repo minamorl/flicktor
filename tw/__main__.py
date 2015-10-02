@@ -33,7 +33,7 @@ def subcommand_log(args):
 
 def subcommand_kill(args):
     api = _api()
-    username=args.screen_name
+    username = args.screen_name
     followers = api.followers_ids(screen_name=username)['ids']
     followings = api.friends_ids(screen_name=username)['ids']
 
