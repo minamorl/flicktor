@@ -31,6 +31,17 @@ def subcommand_log(args):
         print(l['text'])
 
 
+def subcommand_kill(args):
+    api = _api()
+    username=args.screen_name
+    followers = api.followers_ids(screen_name=username)['ids']
+    followings = api.friends_ids(screen_name=username)['ids']
+
+    for user in (api.lookup(str(user) for user in followings if user not in followers)):
+        r = api.friendships_destroy(user_id=user['id_str'])
+        print(r)
+
+
 def import_configurations(path):
     config = configparser.ConfigParser()
     config.read(os.path.expanduser(path))
@@ -48,6 +59,10 @@ def _argpaser():
     subparser_log = subparsers.add_parser('log')
     subparser_log.add_argument('screen_name', nargs='*', default=None)
     subparser_log.set_defaults(func=subcommand_log)
+
+    subparser_kill = subparsers.add_parser('kill')
+    subparser_kill.add_argument('screen_name', nargs='*', default=None)
+    subparser_kill.set_defaults(func=subcommand_kill)
 
     return parser
 
