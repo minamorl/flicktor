@@ -30,9 +30,10 @@ def subcommand_log(args):
         print(l['text'])
 
 
-def subcommand_kill(args):
+def subcommand_remove(args):
     api = _api()
-    username = args.screen_name
+    username = args.screen_name or api.account_verify_credentials()['screen_name']
+ 
     followers = api.followers_ids(screen_name=username)['ids']
     followings = api.friends_ids(screen_name=username)['ids']
 
@@ -53,8 +54,9 @@ def _argpaser():
     subparser_log.add_argument('screen_name', nargs='*', default=None)
     subparser_log.set_defaults(func=subcommand_log)
 
-    subparser_kill = subparsers.add_parser('kill')
-    subparser_kill.add_argument('screen_name', nargs='*', default=None)
-    subparser_kill.set_defaults(func=subcommand_kill)
+    subparser_remove = subparsers.add_parser('remove')
+    subparser_remove.add_argument('screen_name', nargs='*', default=None)
+    subparser_remove.set_defaults(func=subcommand_remove)
 
     return parser
+
