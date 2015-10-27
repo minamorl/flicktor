@@ -10,7 +10,6 @@ def import_configurations(path):
     config.read(os.path.expanduser(path))
     return config
 
-
 @functools.lru_cache()
 def _api():
     conf = import_configurations("~/.staccato.conf")['OAuth1Settings']
@@ -44,6 +43,12 @@ def subcommand_reply(args):
         print("{}: {}".format(l['user']['screen_name'], l['text']))
 
 
+def subcommand_stream(args):
+    screen_name = args.screen_name or _api().account_verify_credentials()['screen_name']
+    for l in _api().user_stream():
+        if "text" in l:
+            print("{}: {}".format(l['user']['screen_name'], l['text']))
+
 def subcommand_remove(args):
     api = _api()
     username = args.screen_name or api.account_verify_credentials()['screen_name']
@@ -63,6 +68,10 @@ def _argpaser():
     subparser_say = subparsers.add_parser('say')
     subparser_say.add_argument('status')
     subparser_say.set_defaults(func=subcommand_say)
+
+    subparser_stream = subparsers.add_parser('stream')
+    subparser_stream.add_argument('screen_name', nargs='*', default=None)
+    subparser_stream.set_defaults(func=subcommand_stream)
 
     subparser_log = subparsers.add_parser('log')
     subparser_log.add_argument('screen_name', nargs='*', default=None)
