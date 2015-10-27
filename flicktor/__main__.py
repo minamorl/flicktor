@@ -1,4 +1,4 @@
-from tw import subcommands
+from flicktor import subcommands
 
 
 def main():
