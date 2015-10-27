@@ -30,6 +30,13 @@ def subcommand_log(args):
         print(l['text'])
 
 
+def subcommand_list(args):
+    screen_name = args.screen_name or _api().account_verify_credentials()['screen_name']
+    logs = _api().lists_statuses(slug=args.slug, owner_screen_name=screen_name)
+    for l in logs:
+        print("{}: {}".format(l['user']['screen_name'], l['text']))
+
+
 def subcommand_reply(args):
     screen_name = args.screen_name or _api().account_verify_credentials()['screen_name']
     logs = _api().statuses_mentions_timeline(screen_name=screen_name)
@@ -60,6 +67,11 @@ def _argpaser():
     subparser_log = subparsers.add_parser('log')
     subparser_log.add_argument('screen_name', nargs='*', default=None)
     subparser_log.set_defaults(func=subcommand_log)
+
+    subparser_list = subparsers.add_parser('list')
+    subparser_list.add_argument('slug')
+    subparser_list.add_argument('screen_name', nargs='*', default=None)
+    subparser_list.set_defaults(func=subcommand_list)
 
     subparser_reply = subparsers.add_parser('reply')
     subparser_reply.add_argument('screen_name', nargs='*', default=None)
