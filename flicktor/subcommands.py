@@ -10,6 +10,7 @@ def import_configurations(path):
     config.read(os.path.expanduser(path))
     return config
 
+
 @functools.lru_cache()
 def _api():
     conf = import_configurations("~/.staccato.conf")['OAuth1Settings']
@@ -49,10 +50,11 @@ def subcommand_stream(args):
         if "text" in l:
             print("{}: {}".format(l['user']['screen_name'], l['text']))
 
+
 def subcommand_remove(args):
     api = _api()
     username = args.screen_name or api.account_verify_credentials()['screen_name']
- 
+
     followers = api.followers_ids(screen_name=username)['ids']
     followings = api.friends_ids(screen_name=username)['ids']
 
@@ -91,4 +93,3 @@ def _argpaser():
     subparser_remove.set_defaults(func=subcommand_remove)
 
     return parser
-
