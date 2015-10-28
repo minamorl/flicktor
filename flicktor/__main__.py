@@ -8,6 +8,8 @@ def main():
         args.func(args)
     except AttributeError:
         parser.print_help()
+    except KeyboardInterrupt:
+        print("bye.")
 
 
 if __name__ == '__main__':
