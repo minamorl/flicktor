@@ -13,7 +13,7 @@ def import_configurations(path):
 
 
 def print_tweet(l):
-    clint.textui.puts(clint.textui.colored.cyan("@" + l['user']['screen_name']))
+    clint.textui.puts(clint.textui.colored.cyan("@{} - {}".format(l['user']['screen_name'], l['created_at'])))
     clint.textui.puts("{} - {} favs".format(l['text'], l['favorite_count']))
 
 
