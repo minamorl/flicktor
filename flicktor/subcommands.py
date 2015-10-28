@@ -17,6 +17,11 @@ def print_tweet(l):
     clint.textui.puts("{} - {} favs".format(l['text'], l['favorite_count']))
 
 
+def print_direct_message(l):
+    clint.textui.puts(clint.textui.colored.cyan("@{} -> @{}".format(l['sender']['screen_name'], l['recipient']['screen_name'])))
+    clint.textui.puts("{}".format(l['text']))
+
+
 @functools.lru_cache()
 def _api():
     conf = import_configurations("~/.staccato.conf")['OAuth1Settings']
@@ -76,6 +81,11 @@ def subcommand_remove(args):
         print(r)
 
 
+def subcommand_dm(args):
+    for l in _api().direct_messages(count=args.count):
+        print_direct_message(l)
+
+
 def _argpaser():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers()
@@ -92,6 +102,10 @@ def _argpaser():
     subparser_log.add_argument('screen_name', nargs='*', default=None)
     subparser_log.add_argument('-c', '--count', default=None)
     subparser_log.set_defaults(func=subcommand_log)
+
+    subparser_dm = subparsers.add_parser('dm')
+    subparser_dm.add_argument('-c', '--count', default=None)
+    subparser_dm.set_defaults(func=subcommand_dm)
 
     subparser_list = subparsers.add_parser('list')
     subparser_list.add_argument('slug')
