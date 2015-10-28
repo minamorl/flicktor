@@ -11,5 +11,6 @@ setup(
     author_email='minamorl@users.noreply.github.com',
     install_requires=[
         'staccato',
+        'clint',
     ],
 )

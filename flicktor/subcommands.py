@@ -3,12 +3,18 @@ import configparser
 import os
 import argparse
 import staccato
+import clint
 
 
 def import_configurations(path):
     config = configparser.ConfigParser()
     config.read(os.path.expanduser(path))
     return config
+
+
+def print_tweet(l):
+    clint.textui.puts(clint.textui.colored.cyan("@" + l['user']['screen_name']))
+    clint.textui.puts("{} - {} favs".format(l['text'], l['favorite_count']))
 
 
 @functools.lru_cache()
@@ -27,28 +33,35 @@ def subcommand_log(args):
     screen_name = args.screen_name or _api().account_verify_credentials()['screen_name']
     logs = _api().statuses_user_timeline(screen_name=screen_name)
     for l in logs:
-        print(l['text'])
+        print_tweet(l)
 
 
 def subcommand_list(args):
     screen_name = args.screen_name or _api().account_verify_credentials()['screen_name']
-    logs = _api().lists_statuses(slug=args.slug, owner_screen_name=screen_name)
+    logs = _api().lists_statuses(count=args.count, slug=args.slug, owner_screen_name=screen_name)
     for l in logs:
-        print("{}: {}".format(l['user']['screen_name'], l['text']))
+        print_tweet(l)
 
 
 def subcommand_reply(args):
     screen_name = args.screen_name or _api().account_verify_credentials()['screen_name']
     logs = _api().statuses_mentions_timeline(screen_name=screen_name)
     for l in logs:
-        print("{}: {}".format(l['user']['screen_name'], l['text']))
+        print_tweet(l)
+
+
+def subcommand_reply(args):
+    screen_name = args.screen_name or _api().account_verify_credentials()['screen_name']
+    logs = _api().statuses_mentions_timeline(screen_name=screen_name)
+    for l in logs:
+        print_tweet(l)
 
 
 def subcommand_stream(args):
     screen_name = args.screen_name or _api().account_verify_credentials()['screen_name']
     for l in _api().user_stream():
         if "text" in l:
-            print("{}: {}".format(l['user']['screen_name'], l['text']))
+            print_tweet(l)
 
 
 def subcommand_remove(args):
@@ -77,11 +90,13 @@ def _argpaser():
 
     subparser_log = subparsers.add_parser('log')
     subparser_log.add_argument('screen_name', nargs='*', default=None)
+    subparser_log.add_argument('-c', '--count', default=None)
     subparser_log.set_defaults(func=subcommand_log)
 
     subparser_list = subparsers.add_parser('list')
     subparser_list.add_argument('slug')
     subparser_list.add_argument('screen_name', nargs='*', default=None)
+    subparser_list.add_argument('-c', '--count', default=None)
     subparser_list.set_defaults(func=subcommand_list)
 
     subparser_reply = subparsers.add_parser('reply')
