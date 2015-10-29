@@ -4,6 +4,7 @@ import os
 import argparse
 import staccato
 import clint
+import datetime
 
 
 def import_configurations(path):
@@ -13,7 +14,8 @@ def import_configurations(path):
 
 
 def print_tweet(l):
-    clint.textui.puts(clint.textui.colored.cyan("@{} - {}".format(l['user']['screen_name'], l['created_at'])))
+    created_at = parse_datetime(l['created_at']).strftime('%Y-%m-%d %H:%M:%S')
+    clint.textui.puts(clint.textui.colored.cyan("@{} - {}".format(l['user']['screen_name'], created_at)))
     clint.textui.puts("{} - {} favs".format(l['text'], l['favorite_count']))
 
 
@@ -21,6 +23,9 @@ def print_direct_message(l):
     clint.textui.puts(clint.textui.colored.cyan("@{} -> @{}".format(l['sender']['screen_name'], l['recipient']['screen_name'])))
     clint.textui.puts("{}".format(l['text']))
 
+
+def parse_datetime(datetime_str):
+    return datetime.datetime.strptime(datetime_str, '%a %b %d %H:%M:%S +0000 %Y')
 
 @functools.lru_cache()
 def _api():
@@ -82,7 +87,13 @@ def subcommand_remove(args):
 
 
 def subcommand_dm(args):
-    for l in _api().direct_messages(count=args.count):
+    received_dm = list(_api().direct_messages(count=args.count))
+    sent_dm = list(_api().direct_messages_sent(count=args.count))
+
+    dms = sorted(received_dm + sent_dm, key=lambda dm: parse_datetime(dm["created_at"]), reverse=True)
+
+
+    for l in dms:
         print_direct_message(l)
 
 
