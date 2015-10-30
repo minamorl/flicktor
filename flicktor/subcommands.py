@@ -5,6 +5,8 @@ import argparse
 import staccato
 import clint
 import datetime
+import pytz
+import dateutil.parser
 
 
 def import_configurations(path):
@@ -25,7 +27,8 @@ def print_direct_message(l):
 
 
 def parse_datetime(datetime_str):
-    return datetime.datetime.strptime(datetime_str, '%a %b %d %H:%M:%S +0000 %Y')
+    return dateutil.parser.parse(datetime_str).replace(tzinfo=pytz.utc).astimezone(pytz.timezone('Asia/Tokyo'))
+
 
 @functools.lru_cache()
 def _api():
@@ -91,7 +94,6 @@ def subcommand_dm(args):
     sent_dm = list(_api().direct_messages_sent(count=args.count))
 
     dms = sorted(received_dm + sent_dm, key=lambda dm: parse_datetime(dm["created_at"]), reverse=True)
-
 
     for l in dms:
         print_direct_message(l)

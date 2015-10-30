@@ -12,5 +12,7 @@ setup(
     install_requires=[
         'staccato',
         'clint',
+        'python-dateutil'
+        'pytz'
     ],
 )
