@@ -5,9 +5,12 @@ def main():
     parser = subcommands._argpaser()
     args = parser.parse_args()
     try: 
-        args.func(args)
-    #  except AttributeError:
-        #  parser.print_help()
+        if hasattr(args, "func"):
+            args.func(args)
+        else:
+            parser.print_help()
+
+
     except KeyboardInterrupt:
         print("bye.")
 
