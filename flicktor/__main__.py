@@ -6,8 +6,8 @@ def main():
     args = parser.parse_args()
     try: 
         args.func(args)
-    except AttributeError:
-        parser.print_help()
+    #  except AttributeError:
+        #  parser.print_help()
     except KeyboardInterrupt:
         print("bye.")
 

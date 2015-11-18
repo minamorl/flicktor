@@ -98,6 +98,24 @@ def subcommand_dm(args):
     for l in dms:
         print_direct_message(l)
 
+def follow_user_recursively(api, username: str, limit=20):
+    import time
+    followings = api.friends_ids(screen_name=username)['ids']
+
+    for user_id in followings[:limit]:
+
+        print(api.friendships_create(user_id=user_id))
+        time.sleep(2)
+
+
+def subcommand_follow(args):
+
+    _api().friendships_create(screen_name=args.screen_name)
+    if args.recursive:
+        follow_user_recursively(_api(), args.screen_name)
+
+        
+
 
 def _argpaser():
     parser = argparse.ArgumentParser()
@@ -133,5 +151,10 @@ def _argpaser():
     subparser_remove = subparsers.add_parser('remove')
     subparser_remove.add_argument('screen_name', nargs='*', default=None)
     subparser_remove.set_defaults(func=subcommand_remove)
+
+    subparser_follow = subparsers.add_parser('follow')
+    subparser_follow.add_argument('-R', '--recursive', action='store_true', default=False)
+    subparser_follow.add_argument('screen_name', nargs='*', default=None)
+    subparser_follow.set_defaults(func=subcommand_follow)
 
     return parser
