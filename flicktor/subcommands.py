@@ -1,84 +1,48 @@
-import functools
-import configparser
-import os
 import argparse
-import staccato
-import clint
-import datetime
-import pytz
-import dateutil.parser
 
-
-def import_configurations(path):
-    config = configparser.ConfigParser()
-    config.read(os.path.expanduser(path))
-    return config
-
-
-def print_tweet(l):
-    created_at = parse_datetime(l['created_at']).strftime('%Y-%m-%d %H:%M:%S')
-    clint.textui.puts(clint.textui.colored.cyan("@{} - {}".format(l['user']['screen_name'], created_at)))
-    clint.textui.puts("{} - {} favs".format(l['text'], l['favorite_count']))
-
-
-def print_direct_message(l):
-    clint.textui.puts(clint.textui.colored.cyan("@{} -> @{}".format(l['sender']['screen_name'], l['recipient']['screen_name'])))
-    clint.textui.puts("{}".format(l['text']))
-
-
-def parse_datetime(datetime_str):
-    return dateutil.parser.parse(datetime_str).replace(tzinfo=pytz.utc).astimezone(pytz.timezone('Asia/Tokyo'))
-
-
-@functools.lru_cache()
-def _api():
-    conf = import_configurations("~/.staccato.conf")['OAuth1Settings']
-    api = staccato.startup()
-    api.auth(conf["CONSUMER_KEY"], conf["CONSUMER_SECRET"], conf["ACCESS_TOKEN_KEY"], conf["ACCESS_TOKEN_SECRET"])
-    return api
-
+from . import *
 
 def subcommand_say(args):
-    _api().statuses_update(status=args.status)
+    api().statuses_update(status=args.status)
 
 
 def subcommand_log(args):
-    screen_name = args.screen_name or _api().account_verify_credentials()['screen_name']
-    logs = _api().statuses_user_timeline(screen_name=screen_name)
+    screen_name = args.screen_name or api().account_verify_credentials()['screen_name']
+    logs = api().statuses_user_timeline(screen_name=screen_name)
     for l in logs:
         print_tweet(l)
 
 
 def subcommand_list(args):
-    screen_name = args.screen_name or _api().account_verify_credentials()['screen_name']
-    logs = _api().lists_statuses(count=args.count, slug=args.slug, owner_screen_name=screen_name)
+    screen_name = args.screen_name or api().account_verify_credentials()['screen_name']
+    logs = api().lists_statuses(count=args.count, slug=args.slug, owner_screen_name=screen_name)
     for l in logs:
         print_tweet(l)
 
 
 def subcommand_reply(args):
-    screen_name = args.screen_name or _api().account_verify_credentials()['screen_name']
-    logs = _api().statuses_mentions_timeline(screen_name=screen_name)
+    screen_name = args.screen_name or api().account_verify_credentials()['screen_name']
+    logs = api().statuses_mentions_timeline(screen_name=screen_name)
     for l in logs:
         print_tweet(l)
 
 
 def subcommand_reply(args):
-    screen_name = args.screen_name or _api().account_verify_credentials()['screen_name']
-    logs = _api().statuses_mentions_timeline(screen_name=screen_name)
+    screen_name = args.screen_name or api().account_verify_credentials()['screen_name']
+    logs = api().statuses_mentions_timeline(screen_name=screen_name)
     for l in logs:
         print_tweet(l)
 
 
 def subcommand_stream(args):
-    screen_name = args.screen_name or _api().account_verify_credentials()['screen_name']
-    for l in _api().user_stream():
+    screen_name = args.screen_name or api().account_verify_credentials()['screen_name']
+    for l in api().user_stream():
         if "text" in l:
             print_tweet(l)
 
 
 def subcommand_remove(args):
-    api = _api()
+    api = api()
     username = args.screen_name or api.account_verify_credentials()['screen_name']
 
     followers = api.followers_ids(screen_name=username)['ids']
@@ -90,13 +54,14 @@ def subcommand_remove(args):
 
 
 def subcommand_dm(args):
-    received_dm = list(_api().direct_messages(count=args.count))
-    sent_dm = list(_api().direct_messages_sent(count=args.count))
+    received_dm = list(api().direct_messages(count=args.count))
+    sent_dm = list(api().direct_messages_sent(count=args.count))
 
     dms = sorted(received_dm + sent_dm, key=lambda dm: parse_datetime(dm["created_at"]), reverse=True)
 
     for l in dms:
         print_direct_message(l)
+
 
 def follow_user_recursively(api, username: str, limit: int):
     import time
@@ -110,11 +75,9 @@ def follow_user_recursively(api, username: str, limit: int):
 
 def subcommand_follow(args):
 
-    _api().friendships_create(screen_name=args.screen_name)
+    api().friendships_create(screen_name=args.screen_name)
     if args.recursive:
-        follow_user_recursively(_api(), args.screen_name, int(args.count))
-
-        
+        follow_user_recursively(api(), args.screen_name, int(args.count))
 
 
 def _argpaser():
