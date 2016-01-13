@@ -80,6 +80,14 @@ def subcommand_follow(args):
         follow_user_recursively(api(), args.screen_name, int(args.count))
 
 
+def subcommand_search(args):
+
+    tweets = api().search_tweets(q=args.query, count=100).get("statuses")
+    for t in tweets:
+        print(t.get("text"))
+
+
+
 def _argpaser():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers()
@@ -114,6 +122,10 @@ def _argpaser():
     subparser_remove = subparsers.add_parser('remove')
     subparser_remove.add_argument('screen_name', nargs='*', default=None)
     subparser_remove.set_defaults(func=subcommand_remove)
+
+    subparser_search = subparsers.add_parser('search')
+    subparser_search.add_argument('query', nargs='*', default=None)
+    subparser_search.set_defaults(func=subcommand_search)
 
     subparser_follow = subparsers.add_parser('follow')
     subparser_follow.add_argument('-R', '--recursive', action='store_true', default=False)

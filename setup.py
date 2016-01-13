@@ -13,6 +13,8 @@ setup(
         'staccato',
         'clint',
         'python-dateutil',
+        'requests',
+        'requests-oauthlib',
         'pytz'
     ],
 )
