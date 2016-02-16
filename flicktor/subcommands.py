@@ -42,14 +42,13 @@ def subcommand_stream(args):
 
 
 def subcommand_remove(args):
-    api = api()
-    username = args.screen_name or api.account_verify_credentials()['screen_name']
+    username = args.screen_name or api().account_verify_credentials()['screen_name']
 
-    followers = api.followers_ids(screen_name=username)['ids']
-    followings = api.friends_ids(screen_name=username)['ids']
+    followers = api().followers_ids(screen_name=username)['ids']
+    followings = api().friends_ids(screen_name=username)['ids']
 
-    for user in (api.lookup(str(user) for user in followings if user not in followers)):
-        r = api.friendships_destroy(user_id=user['id_str'])
+    for user in (api().lookup(str(user) for user in followings if user not in followers)):
+        r = api().friendships_destroy(user_id=user['id_str'])
         print(r)
 
 
